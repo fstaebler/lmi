@@ -2,6 +2,7 @@ import struct
 import bitstruct
 import sys
 import imageSaver as imgS
+import shapeSaver as shaS
 targetFile = sys.argv[1]
 
 def parseTag(tagType, tagData):
@@ -11,10 +12,12 @@ def parseTag(tagType, tagData):
     print("Non-Standard Tag Type: " + str(tagType))
     return False
   try:
-    return {"TagName": tagName, "TagContent": eval("parse" + tagName + "(tagData)")}
+    eval("parse" + tagName)
   except NameError:
-    print("Failed Parsing " + tagName + " Tag!")
-    return False
+    return {"TagName": tagName, "TagContent": "Unimplemented"}
+  else:
+    return {"TagName": tagName, "TagContent": eval("parse" + tagName + "(tagData)")}
+
 #def parseFileAttribute(tagData):
 #  print("FileAttribute Tag.")
 #  print("")
@@ -22,15 +25,19 @@ def parseTag(tagType, tagData):
 def parseSetBackgroundColor(tagData):
   #SetBackgroundColor Tag - Contains the background color.
   return{"R": tagData[0], "G": tagData[1], "B": tagData[2]}
+
 #def parseEnableDebugger2(tagData):
 #  print("EnableDebugger2 Tag.")
 #  print("")
+
 def parseShowFrame(tagData):
   #ShowFrame Tag - Has no specified data.
   return {}
+
 def parseEnd(tagData):
   #End Tag - Has no specified data.
   return {}
+
 #def parseImportAssets2(tagData):
 #  print("ImportAssets2 Tag.")
 #  print("")
@@ -58,7 +65,9 @@ def parseSymbolClass(tagData):
     symbolName = str(bytearray(symbolName), "ascii")
     r["symbols"] += [{"ID": symbolID, "Name": symbolName}]
   return r
+
 def parseDefineBitsLossless(tagData):
+  #DefineBitsLossless Tag - Stores zlib compressed bitmap data
   characterId = struct.unpack("<H", tagData[0:2])[0]
   bitmapFormat = tagData[2]
   bitmapWidth = struct.unpack("<H", tagData[3:5])[0]
@@ -69,13 +78,20 @@ def parseDefineBitsLossless(tagData):
   else:
     cursor = 7
     tableSize = 0
-  bitmapPath = imgS.bitsLossless(tagData[cursor:], bitmapFormat, bitmapWidth, bitmapHeight, tableSize, targetFile + ".characters." + str(characterId))
+  bitmapPath = imgS.bitsLossless(tagData[cursor:],
+                                 bitmapFormat,
+                                 bitmapWidth,
+                                 bitmapHeight,
+                                 tableSize,
+                                 targetFile + ".characters." + str(characterId))
   return {"CharacterId": characterId,
           "BitmapFormat": bitmapFormat,
           "bitmapWidth": bitmapWidth,
           "bitmapHeight": bitmapHeight, 
           "bitmapData": bitmapPath}
+
 def parseDefineBitsLossless2(tagData):
+  #DefineBitsLossless2 Tag - Stores zlib compressed bitmap data with transparency information
   characterId = struct.unpack("<H", tagData[0:2])[0]
   bitmapFormat = tagData[2]
   bitmapWidth = struct.unpack("<H", tagData[3:5])[0]
@@ -86,13 +102,20 @@ def parseDefineBitsLossless2(tagData):
   else:
     cursor = 7
     tableSize = 0
-  bitmapPath = imgS.bitsLossless(tagData[cursor:], bitmapFormat + 10, bitmapWidth, bitmapHeight, tableSize, targetFile + ".characters." + str(characterId))
+  bitmapPath = imgS.bitsLossless(tagData[cursor:],
+                                 bitmapFormat + 10,
+                                 bitmapWidth,
+                                 bitmapHeight,
+                                 tableSize,
+                                 targetFile + ".characters." + str(characterId))
   return {"CharacterId": characterId, 
           "BitmapFormat": bitmapFormat, 
           "BitmapWidth": bitmapWidth,
           "BitmapHeight": bitmapHeight,
           "BitmapData": bitmapPath}
+
 def parseDefineSound(tagData):
+  #DefineSound - Stores audio data, either uncompressed or compressed
   characterId = struct.unpack("<H", tagData[0:2])[0]
   formatRateSizeType = bitstruct.bytesToBits([tagData[2]])
   soundFormat = bitstruct.bitsToUInt(formatRateSizeType[0:4])
@@ -102,9 +125,64 @@ def parseDefineSound(tagData):
   else:
     soundSize = 8
   soundStereo = formatRateSizeType[7]
+  #
+  #TODO: Save audio, at least as raw data.
+  #
   return {"CharacterId": characterId,
           "SoundFormat": soundFormat,
           "SampleRate": [5512, 11025, 22050, 44100][soundRate],
           "SampleSize": soundSize,
           "Stereo":soundStereo
+         }
+
+def parseDefineShape(tagData):
+  #DefineShape - Stores styles and shapes
+  characterId = struct.unpack("<H", tagData[0:2])[0]
+  cursor, shapeBounds = bitstruct.unpackRECT(tagData[2:])
+  cursor += 2
+  fillStyles, lineStyles, shapeRecords = shaS.defineShape(tagData[cursor:], 1)
+  return {"CharacterId": characterId,
+          "ShapeBounds": shapeBounds,
+          "FillStyles": fillStyles,
+          "LineStyles": lineStyles,
+          "ShapeRecords": shapeRecords
+         }
+
+def parseDefineShape2(tagData):
+  #DefineShape - Stores styles and shapes
+  characterId = struct.unpack("<H", tagData[0:2])[0]
+  cursor, shapeBounds = bitstruct.unpackRECT(tagData[2:])
+  cursor += 2
+  fillStyles, lineStyles, shapeRecords = shaS.defineShape(tagData[cursor:], 2)
+  return {"CharacterId": characterId,
+          "ShapeBounds": shapeBounds,
+          "FillStyles": fillStyles,
+          "LineStyles": lineStyles,
+          "ShapeRecords": shapeRecords
+         }
+
+def parseDefineShape3(tagData):
+  #DefineShape - Stores styles and shapes
+  characterId = struct.unpack("<H", tagData[0:2])[0]
+  cursor, shapeBounds = bitstruct.unpackRECT(tagData[2:])
+  cursor += 2
+  fillStyles, lineStyles, shapeRecords = shaS.defineShape(tagData[cursor:], 3)
+  return {"CharacterId": characterId,
+          "ShapeBounds": shapeBounds,
+          "FillStyles": fillStyles,
+          "LineStyles": lineStyles,
+          "ShapeRecords": shapeRecords
+         }
+
+def parseDefineShape4(tagData):
+  #DefineShape - Stores styles and shapes
+  characterId = struct.unpack("<H", tagData[0:2])[0]
+  cursor, shapeBounds = bitstruct.unpackRECT(tagData[2:])
+  cursor += 2
+  fillStyles, lineStyles, shapeRecords = shaS.defineShape(tagData[cursor:], 4)
+  return {"CharacterId": characterId,
+          "ShapeBounds": shapeBounds,
+          "FillStyles": fillStyles,
+          "LineStyles": lineStyles,
+          "ShapeRecords": shapeRecords
          }

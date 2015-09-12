@@ -30,8 +30,12 @@ Right now, lmi only parses very few tags.
 * ShowFrame
 * End
 * SymbolClass
-* DefineBitsLossless
 * DefineBitsLossless2
 
 Partially supported:
 * DefineSound - No actual sound data is exported.
+* DefineBitsLossless
+* DefineShape
+* DefineShape2
+* DefineShape3
+* DefineShape4

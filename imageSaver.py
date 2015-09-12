@@ -50,5 +50,8 @@ def bitsLossless(data, imgformat, width, height, tableSize, path):
   else:
     print(str(imgformat))
     print("not implemented!")
-  i.save(path + ".png")
-  return path + ".png"
+  try:
+    i.save(path + ".png")
+    return path + ".png"
+  except:
+    return False
