@@ -25,7 +25,7 @@ The JSON file contains an array of all tags, in the original order and with all 
 
 Right now, lmi only parses very few tags.
 
-##### Supported Tags (b8aac4ccec73ff8fab5b33cd94d6deb842f7aac1)
+##### Supported Tags
 * SetBackgroundColor
 * ShowFrame
 * End

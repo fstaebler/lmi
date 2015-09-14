@@ -179,9 +179,12 @@ def parseDefineShape4(tagData):
   characterId = struct.unpack("<H", tagData[0:2])[0]
   cursor, shapeBounds = bitstruct.unpackRECT(tagData[2:])
   cursor += 2
-  fillStyles, lineStyles, shapeRecords = shaS.defineShape(tagData[cursor:], 4)
+  offset, edgeBounds = bitstruct.unpackRECT(tagData[cursor:])
+  cursor += offset
+  fillStyles, lineStyles, shapeRecords = shaS.defineShape4(tagData[cursor:])
   return {"CharacterId": characterId,
           "ShapeBounds": shapeBounds,
+          "EdgeBounds": edgeBounds,
           "FillStyles": fillStyles,
           "LineStyles": lineStyles,
           "ShapeRecords": shapeRecords
