@@ -31,11 +31,20 @@ Right now, lmi only parses very few tags.
 * End
 * SymbolClass
 * DefineBitsLossless2
+* DefineBitsLossless - This one is not entirely tested yet.
+
 
 Partially supported:
 * DefineSound - No actual sound data is exported.
-* DefineBitsLossless
-* DefineShape
-* DefineShape2
-* DefineShape3
+* DefineShape - Only parses some basic data and a bit of the style definitions.
+* DefineShape2 - See above.
+* DefineShape3 - See above.
+
+Roadmap:
 * DefineShape4
+* FileAttributes
+* DefineSprite
+* DefineButton
+
+#### prerequisites
+* PIP - actually, `pillow`. install with `pip`: `$ sudo -H pip install pillow`. Might require `python3-dev` or a comparable package to build.
