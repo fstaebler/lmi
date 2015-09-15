@@ -47,4 +47,4 @@ Roadmap:
 * DefineButton
 
 #### prerequisites
-* PIP - actually, `pillow`. install with `pip`: `$ sudo -H pip install pillow`. Might require `python3-dev` or a comparable package to build.
+* PIL - actually, `pillow`. install with `pip`: `$ sudo -H pip install pillow`. Might require `python3-dev` or a comparable package to build.
